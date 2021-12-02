@@ -105,7 +105,11 @@ panel.grid.minor = element_blank(), axis.text = element_text(size = 10), axis.ti
 Tourist1
 ```
 
+<<<<<<< HEAD
+Another interesting relationship that stuck out to me was the relationship between restaurants with at least one other sister restaurant and the ratings(`relations`). As can be seen in Figure 3, there appears to be a negative relationship between number of relations and the ratings. As number of relations increases, the star rating decreases. 
+=======
 Another interesting relationship that stuck out to me was the relationship between restaurants with at least one other sister restaurant and the ratings(`relations`). As can be seen in Figure 3, there appears to be a negative relationship between number of relations and the ratings. As number of relations increases, the star rating decreases. Additionally
+>>>>>>> fd83a93679de3b80a49fab2e2e0b31e34c14530b
 
 ```{r,message=FALSE, echo = FALSE,warning=FALSE, fig.cap = "Distribution of Stars by Number of Relations and Postal Code", fig.align='center', fig.height=4, fig.width=10, fig.align='center',}
 
@@ -121,7 +125,11 @@ Tourist2
 ```
 \newpage
 
+<<<<<<< HEAD
+In addition two those two variables, I added type of restaurant, average number of reviews in a postal code(foot traffic), average positive sentiment review score per business, and population per postal code. More EDA plots can be found in the appendix.
+=======
 In addition two those two variables, I added type of restaurant, average number of reviews in a postal code(foot traffic), average positive sentiment review score per business, and population per postal code. Plots for `tourist` and `relations` variables are below, however more EDA plots can be found in the appendix.
+>>>>>>> fd83a93679de3b80a49fab2e2e0b31e34c14530b
 
 
 
