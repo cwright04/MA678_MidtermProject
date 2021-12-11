@@ -23,16 +23,16 @@ library("wordcloud2")
   #   NOTE: this data has been pulled from the yelp academic datasets and has been 
   #         subset using SQL queries and exported to CSV files to easily pull into R
   
-  Yelp_data <- read_csv("data/MA_RESTAURANT_REVIEW.csv")
+  Yelp_data <- read_csv("MA_RESTAURANT_REVIEW.csv")
   
   # Population data: 
   #  https://www.massachusetts-demographics.com/zip_codes_by_population
-  pop_counts <- read_csv("data/Population_per_zip.csv")
+  pop_counts <- read_csv("Population_per_zip.csv")
   
   
   # Median income data: 
   #   http://zipatlas.com/us/ma/zip-code-comparison/median-household-income.6.htm
-  median_income <- read_csv("data/Median_Income_per_zip.csv")
+  median_income <- read_csv("Median_Income_per_zip.csv")
   median_income %<>% mutate(postal_code = paste0("0",postal_code))
   
   
@@ -95,7 +95,7 @@ library("wordcloud2")
   
 ### Create Chain indicator
    #Note: all names have been manually cleaned to remove all special characters
-   Clean_names <- read.csv("data/Name_ID_CrossWalk_Clean.csv")
+   Clean_names <- read.csv("Name_ID_CrossWalk_Clean.csv")
    
    chains <- data.frame(table(Clean_names$name_clean))
    
@@ -196,7 +196,35 @@ library("wordcloud2")
    #Join with overall yelp_data
    Yelp_data1 <- left_join(Yelp_data1,tidy_cats1, by = "business_id") %>% mutate_if(is.numeric, ~replace(., is.na(.), 2))
    
-   
+#Make 1 variable with mulitple levels for type of restaurant
+   Yelp_data1$Restaurant_type <-  ifelse(Yelp_data1$italian == 1 & Yelp_data1$chinese != 1 & Yelp_data1$mexican != 1 & 
+                                                          Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & Yelp_data1$thai != 1 & 
+                                                          Yelp_data1$spanish != 1 & Yelp_data1$indian != 1 &  Yelp_data1$mediterranean != 1, 1,
+                                        ifelse(Yelp_data1$chinese == 1 & Yelp_data1$italian != 1 & Yelp_data1$mexican != 1 & 
+                                                  Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & Yelp_data1$thai != 1 & 
+                                                  Yelp_data1$spanish != 1 & Yelp_data1$indian != 1 & Yelp_data1$mediterranean != 1,2,
+                                               ifelse(Yelp_data1$mexican == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                         Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & Yelp_data1$thai != 1 & 
+                                                         Yelp_data1$spanish != 1 & Yelp_data1$indian != 1 &  Yelp_data1$mediterranean != 1,3,
+                                                      ifelse(Yelp_data1$japanese == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                                Yelp_data1$mexican != 1 & Yelp_data1$greek != 1 & Yelp_data1$thai != 1 & 
+                                                                Yelp_data1$spanish != 1 & Yelp_data1$indian != 1 & Yelp_data1$mediterranean != 1,4,
+                                                             ifelse(Yelp_data1$greek == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                                       Yelp_data1$mexican != 1 & Yelp_data1$japanese != 1 & Yelp_data1$thai != 1 & 
+                                                                       Yelp_data1$spanish != 1 & Yelp_data1$indian != 1 & Yelp_data1$mediterranean != 1,5,
+                                                                    ifelse(Yelp_data1$thai == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                                              Yelp_data1$mexican != 1 & Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & 
+                                                                              Yelp_data1$spanish != 1 & Yelp_data1$indian != 1 & Yelp_data1$mediterranean != 1,6,
+                                                                           ifelse(Yelp_data1$spanish == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                                                     Yelp_data1$mexican != 1 & Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & 
+                                                                                     Yelp_data1$thai != 1 & Yelp_data1$indian != 1 & Yelp_data1$mediterranean != 1,7,
+                                                                                  ifelse(Yelp_data1$indian == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                                                            Yelp_data1$mexican != 1 & Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & 
+                                                                                            Yelp_data1$thai != 1 & Yelp_data1$spanish != 1 & Yelp_data1$mediterranean != 1,8,
+                                                                                         ifelse(Yelp_data1$mediterranean == 1 & Yelp_data1$italian != 1 & Yelp_data1$chinese != 1 & 
+                                                                                                   Yelp_data1$mexican != 1 & Yelp_data1$japanese != 1 & Yelp_data1$greek != 1 & 
+                                                                                                   Yelp_data1$thai != 1 & Yelp_data1$spanish != 1 & Yelp_data1$indian != 1,9,10)))))))))
+                                                      
    
 ### Create average rating by zipcode
    average_star_by_zip <- Yelp_data1 %>% group_by(postal_code) %>% summarise(avg_rating_by_zip = mean(bus_stars))
@@ -215,11 +243,13 @@ library("wordcloud2")
    Yelp_data1 %<>% mutate(average_num_reviews = review_count_zip/rest_num )
    
    
+   
+
 ### Keep only necessary variables
    Yelp_data_final <- Yelp_data1[,c("business_id","bus_stars","postal_code","median_income", "Population", "Tourist", 
                                     "avg_pos_sent_pct", "Relations", "pricerange","alcohol_r",  "average_num_reviews",
                                     "italian", "chinese", "mexican", "japanese", "greek", "thai", "spanish", "indian", 
-                                    "mediterranean" )]
+                                    "mediterranean", "Restaurant_type")]
    
    
    

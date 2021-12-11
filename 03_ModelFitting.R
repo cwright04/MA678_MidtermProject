@@ -233,25 +233,41 @@ library(gridExtra)
    MultiFit7.1 <- lmer(bus_stars ~ avg_pos_sent_pct_scaled  + Relations_scaled  + italian + chinese + mexican + japanese + greek  + thai +
                              spanish + indian + mediterranean  + Population_scaled + Tourist + average_num_reviews_scaled  + 
                              (1+Tourist|postal_code), data = Yelp_data_final)
-   print(MultiFit7.1)
-   
-   plot(MultiFit7.1)
-   
-   coef(MultiFit7.1)$postal_code
-   ranef(MultiFit7.1)$postal_code
-   
-   qqmath(MultiFit7.1)
-
-   ggplot(data.frame(lev=hatvalues(MultiFit7.1),pearson=residuals(MultiFit7.1,type="pearson")),
-          aes(x=lev,y=pearson)) +
-     geom_point() +
-     theme_bw()
-   
-   
 
    
-
+   #Add restaurant type as a random effect
+   # MultiFit7.2 <- stan_glmer(bus_stars ~ avg_pos_sent_pct_scaled  + Relations_scaled  + Population_scaled + Tourist +
+   #                             average_num_reviews_scaled  + (1+Tourist|postal_code) + (1|Restaurant_type), data = Yelp_data_final)
+   
+   saveRDS(MultiFit7.2,"MultiFit7.2.rds")
    
    
-   #Model checking resources
-   # https://www.ssc.wisc.edu/sscc/pubs/MM/MM_DiagInfer.html
+   
+   
+   
+   
+   MultiFit7.3 <- stan_glmer(avg_pos_sent_pct_scaled ~  Relations_scaled  + Population_scaled + Tourist +
+                               average_num_reviews_scaled  + (1+Tourist|postal_code) + (1+Tourist|Restaurant_type), data = Yelp_data_final)
+   saveRDS(MultiFit7.3,"MultiFit7.3.rds")
+#    
+#    print(MultiFit7.3)
+#   pp_check(MultiFit7.3)
+# 
+# 
+# 
+# print(MultiFit7.2,digits = 2)
+# 
+# summary(MultiFit7.3)
+# 
+# summary(MultiFit7.3, 
+#         pars = c("(Intercept)", "average_num_reviews_scaled", "Relations_scaled", "Population_scaled", "Tourist1"),
+#         probs = c(0.025, 0.975),
+#         digits = 2)
+# 
+# coef(MultiFit7.3)
+# ranef(MultiFit7.3)
+# 
+# 
+# 
+# fixef(MultiFit7.3)
+# 
