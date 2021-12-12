@@ -1,7 +1,7 @@
 ---
 title: "MA678 Midterm Project"
 author: "Carolyn Wright"
-date: "December 2, 2021"
+date: "December 12, 2021"
 output: pdf_document
 geometry: margin=1.5cm
 always_allow_html: true
@@ -42,7 +42,7 @@ library("broom.mixed")
 
 
 # Abstract
-The Yelp Dataset Challenge was put together in order to provide students with the opportunity to conduct analysis or research using Yelp's very large and comprehensive dataset. This data contains information on reviews, businesses, users, tips, and check-ins. Using primarily the businesses and reviews data, I built a multilevel model to better understand some of the predictors of the average proportion of positive reviews a restaurant has from a consumers perspective. Some of these predictors include whether a restaurant is in an area with a tourist attraction, the number of sister restaurants a restaurant has, and the type of cuisine the restaurant serves. The multilevel model uses restaurant type and postal code as random intercepts and the tourism indicator as random slopes effect. The result of this model did not show any major effect due to restaurant type and postal code, however there is an impact of tourism within different postal codes. Although this effect is minor, it does exist.
+The Yelp Dataset Challenge was put together in order to provide students with the opportunity to conduct analysis or research using Yelp's very large and comprehensive dataset. This data contains information on reviews, businesses, users, tips, and check-ins. Using primarily the businesses and reviews data, I built a multilevel model to better understand some of the predictors of the average percent of positive sentiments within the reviews a restaurant has from a consumers perspective. Some of these predictors include whether a restaurant is in an area with a tourist attraction, the number of sister restaurants a restaurant has, and the type of cuisine the restaurant serves. The multilevel model uses restaurant type and postal code as random intercepts and the tourism indicator as random slope effect. The result of this model leads to the conclusion that the random effects did prove to have very much of an impact on the model. However, when looking at the fixed effects one can quickly see that they number of relations a restuarant has along with the number of reviews a restaurant has, has a slight impact on the sentiment score of a restaurants average review.
 
 <center> 
 
@@ -59,12 +59,12 @@ I will focus this investigation on restaurants within Boston, Massachusetts.
 
 # Method
 
-The Yelp review data is made up of individual reviews and ratings of restaurants within the US. This data has been pared down to just restaurants within Boston, Massachusetts zip codes within the years of 2015-2020. Additionally, in order to have one observation per restaurant the percent of positive sentiment of the reviews was averaged across all reviews during this time period. Other group level(postal code) variables were added on to the data as supplemental sources of information.
+The Yelp review data is made up of individual reviews and ratings of restaurants within the US. This data has been pared down to just restaurants within Boston, Massachusetts zip codes within the years of 2015-2020. Additionally, in order to have one observation per restaurant the percent of positive sentiment of each reviews was averaged across all reviews during this time period for each restuarant. Other group level(postal code) variables were added on to the data as supplemental sources of information.
 
 
 ### Exploratory Data Analysis
 
-Once the data had been subset down to just Boston, Massachusetts postal codes, I began to explore what relationships might be interesting to look at.  During this exploration I primarily used the existing data or external sources to create variables. I was focused on creating variables that would impact ratings from the perspective of a consumer. I quickly realized that ratings or stars have a clear linear relationship with the sentiment of a review, therefore instead of using stars as my outcome I chose to use the average of the positive percentages of reviews for each restaurant.
+Once the data had been subset down to just Boston, Massachusetts postal codes, I began to explore what relationships might be interesting to look at. During this exploration I primarily used the existing data or external sources to create variables. I was focused on creating variables that would impact ratings from the perspective of a consumer. I quickly realized that ratings or stars have a clear linear relationship with the sentiment of a review, therefore instead of using stars as my outcome I chose to use the average of the positive percentages of reviews for each restaurant.
 
 
 ```{r, echo = FALSE,message=FALSE, echo = FALSE, fig.cap = "Relationship between stars and Review Sentiment", fig.align='center', fig.height=4, fig.width=10}
@@ -105,7 +105,7 @@ Tourist1
  
 \newpage
 
-Another interesting relationship that stuck out to me was the relationship between restaurants with at least one other sister restaurant(`relations`) and the ratings. As can be seen in Figure 3, there appears to be a negative relationship between number of relations and the ratings. As number of relations increases, the star rating decreases. These slopes differ slightly between tourist locations and non-tourist locations. Note: The varying colors represent the different postal codes.
+Another interesting relationship that stuck out to me was the relationship between restaurants with at least one other sister restaurant(`relations`) and the ratings. As can be seen in Figure 4, there appears to be a negative relationship between number of relations and the ratings. As number of relations increases, the star rating decreases. These slopes differ slightly between tourist locations and non-tourist locations. Note: The varying colors represent the different postal codes.
 
 ```{r,message=FALSE, echo = FALSE,warning=FALSE, fig.cap = "Distribution of Stars by Number of Relations", fig.align='center', fig.height=4, fig.width=10, fig.align='center'}
 
@@ -152,7 +152,7 @@ fixef(fit)
 
 
 ```
-Below is the multilevel model I used. This model uses postal code as the varying intercept and Tourist as the varying slope.
+Below is the multilevel model I used. This model uses postal code and restaurant type as the varying intercept and Tourist as the varying slope.
 
 
 
@@ -365,11 +365,11 @@ The median income and population information by postal code was manually extract
 | postal_code       | The postal code indicator.|
 | Tourist           | Whether or not restaurant exists in a postal code that has a major tourist attraction.|
 
-\newpage
+
 
 
 ## Model Checking
-```{r, message=FALSE, warning = FALSE, echo = F, fig.cap="PP Check",fig.align='center',fig.height=5, fig.width=10}
+```{r, message=FALSE, warning = FALSE, echo = F, fig.cap="PP Check; left: ppcheck, right: errors",fig.align='center',fig.height=5, fig.width=10}
 
 
 # http://mc-stan.org/rstanarm/reference/pp_check.stanreg.html
@@ -384,12 +384,15 @@ grid.arrange(pp2,errors, nrow = 1)
 
 ```
 
+\newpage
 
 ## Sentiment Analysis
 
 ### Word Clouds
 
 ![One Star Reviews](OneStarCloud.png){width=75%}
+
+
 
 ![Two Star Reviews](TwoStarCloud.png){width=75%}
 
@@ -399,16 +402,11 @@ grid.arrange(pp2,errors, nrow = 1)
 
 ![Five Star Reviews](FiveStarCloud.png){width=75%}
 
+\newpage
 
 ### Sentiment Plots
-```{r, echo = FALSE}
 
-ggplot(Yelp_data_final) + geom_point(mapping=aes(x=avg_pos_sent_pct, y = bus_stars), alpha = .5,  size = 1, position = "jitter") +
-    ylab("Stars") + xlab("Average Sentiment - Percent Positive") +
-   ggtitle("Relationship Between Rating and Average Postive Sentiment Percent Scores")
-```
- 
-```{r,message=FALSE,echo = FALSE,fig.cap = "Relationship Between Rating and Average Postive Sentiment Percent Scores", fig.align='center'}
+```{r,message=FALSE, echo = FALSE,warning=FALSE,fig.cap = "Relationship Between Rating and Average Postive Sentiment Percent Scores", fig.align='center'}
 
 ggplot(Yelp_data_final,mapping=aes(x=avg_pos_sent_pct, y = bus_stars)) + geom_point(color= Yelp_data_final$postal_code, alpha = .5,  size = 1, position = "jitter") +
     ylab("Stars") + xlab("Average Sentiment - Percent Positive") +
@@ -416,9 +414,9 @@ ggplot(Yelp_data_final,mapping=aes(x=avg_pos_sent_pct, y = bus_stars)) + geom_po
   facet_wrap(~Yelp_data_final$postal_code)
 ```
 
+\newpage
 
-
-## Plots
+## Other Plots
 
 # Distribution of Stars by Postal Code
 
@@ -432,14 +430,8 @@ ggplot(bar_plot) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "identity",
 panel.grid.minor = element_blank())
 ```
  
-```{r, echo = FALSE}
 
-bar_plot <- Yelp_data_final %>% group_by(postal_code, bus_stars, Tourist) %>% count(bus_stars)
-   
-ggplot(bar_plot) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "identity", fill = bar_plot$postal_code, alpha = .5) + 
-   facet_wrap(~bar_plot$postal_code) + ylab("Star Count") + xlab("Stars") + ggtitle("Distribution of Stars by Postal Code") +
-  geom_vline(mapping = aes(xintercept = mean(Yelp_data_final$bus_stars)), linetype = "dashed", color = "red", size = .5)
-
+```{r, message=FALSE, echo = FALSE,warning=FALSE}
 
 bar_plot <- Yelp_data_final %>% group_by(postal_code, bus_stars, Tourist, rest_num) %>% count(bus_stars) %>% mutate(star_prop = n/rest_num)
    
@@ -450,7 +442,7 @@ ggplot(bar_plot) + geom_bar(mapping=aes(x = bus_stars, y = star_prop),stat = "id
 ```
 
 # Tourist Plots
-```{r, echo = FALSE}
+```{r, message=FALSE, echo = FALSE,warning=FALSE}
 
 bar_plot$tourist1 <- ifelse(bar_plot$Tourist == "0",2,1)
 
@@ -462,7 +454,7 @@ ggplot(bar_plot) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "identity",
 
 # Foot Traffic Plots
 
-```{r, echo = FALSE}
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 
 ggplot(Yelp_data_final,aes(x = bus_stars, y = average_num_reviews)) + geom_point( color = Yelp_data_final$postal_code) + facet_wrap(~Yelp_data_final$postal_code) + 
    ylab("Number of Reviews(foot traffic)") + xlab("Stars") + 
@@ -472,7 +464,7 @@ ggplot(Yelp_data_final,aes(x = bus_stars, y = average_num_reviews)) + geom_point
 
 # Relations Plots
 
-```{r, echo = FALSE}
+```{r, message=FALSE, echo = FALSE,warning=FALSE}
 
 ggplot(Yelp_data_final,aes(x = bus_stars, y = Relations)) + geom_point(color = Yelp_data_final$postal_code) + facet_wrap(~Yelp_data_final$postal_code) + 
    ylab("Number of Relations") + xlab("Stars") + 
@@ -483,7 +475,7 @@ ggplot(Yelp_data_final,aes(x = bus_stars, y = Relations)) + geom_point(color = Y
 
 # Median Income Plots
 
-```{r, echo = FALSE}
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 
 ggplot(Yelp_data_final, aes(x = bus_stars, y = median_income)) + geom_point(color = Yelp_data_final$tourist1) + facet_wrap(~Yelp_data_final$postal_code) + 
    ylab("Number of Relations") + xlab("Stars") + 
@@ -492,7 +484,7 @@ ggplot(Yelp_data_final, aes(x = bus_stars, y = median_income)) + geom_point(colo
 
 # Restaurant Type Plots
 
-```{r, echo = FALSE}
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 
 Italian  <- subset(Yelp_data_final, italian == 1)
 
@@ -503,7 +495,9 @@ ggplot(bar_plot_italian) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "id
   facet_wrap(~bar_plot_italian$postal_code) + ylab("Star Count") + xlab("Stars") + ggtitle("Distribution of Stars by Postal Code - Italian") +
   geom_vline(mapping = aes(xintercept = mean(Yelp_data_final$bus_stars)), linetype = "dashed", color = "red", size = .5)
 
+```
 
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 bar_plot_italian$tourist1 <- ifelse(bar_plot_italian$Tourist == "0",2,1)
 
 ggplot(bar_plot_italian) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "identity", fill = bar_plot_italian$tourist1) + 
@@ -511,6 +505,9 @@ ggplot(bar_plot_italian) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "id
   ggtitle("Distribution of Stars by Postal Code - Italian", subtitle="Red - No Toursit Attracttion, Black - Tourist Attraction") +
   geom_vline(mapping = aes(xintercept = mean(Yelp_data_final$bus_stars)), linetype = "dashed", color = "red", size = .5)
 
+```
+
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 
 rest_num_italian <- Italian %>% group_by(postal_code) %>% count(postal_code) %>% rename(rest_num_italian = n)
 rest_num_Tourist_italian <- Italian %>% group_by(Tourist) %>% count(Tourist) %>% rename(rest_num_tourist_italian = n)
@@ -525,12 +522,12 @@ bar_plot1_italian$tourist1 <- ifelse(bar_plot_italian$Tourist == "0",2,1)
 
 ggplot(bar_plot1_italian) + geom_bar(mapping=aes(x = bus_stars, y = star_prop_tourist),stat = "identity", fill = bar_plot1_italian$tourist1) + 
   facet_wrap(~bar_plot1_italian$postal_code) + ylab("Star Proportion") + xlab("Stars") + 
-  ggtitle("Proportio of Stars by Postal Code - Italian", subtitle="Red - No Toursit Attracttion, Black - Tourist Attraction")
+  ggtitle("Proportion of Stars by Postal Code - Italian", subtitle="Red - No Toursit Attracttion, Black - Tourist Attraction")
 
 
 ```
 
-```{r, echo = FALSE}
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 
 Chinese  <- subset(Yelp_data_final, chinese == 1)
 
@@ -541,7 +538,9 @@ ggplot(bar_plot_chinese) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "id
   facet_wrap(~bar_plot_chinese$postal_code) + ylab("Star Count") + xlab("Stars") + ggtitle("Distribution of Stars by Postal Code - Chinese") +
   geom_vline(mapping = aes(xintercept = mean(Yelp_data_final$bus_stars)), linetype = "dashed", color = "red", size = .5)
 
+```
 
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 bar_plot_chinese$tourist1 <- ifelse(bar_plot_chinese$Tourist == "0",2,1)
 
 ggplot(bar_plot_chinese) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "identity", fill = bar_plot_chinese$tourist1) + 
@@ -549,7 +548,9 @@ ggplot(bar_plot_chinese) + geom_bar(mapping=aes(x = bus_stars, y = n),stat = "id
   ggtitle("Distribution of Stars by Postal Code - Chinese", subtitle="Red - No Toursit Attracttion, Black - Tourist Attraction") +
   geom_vline(mapping = aes(xintercept = mean(Yelp_data_final$bus_stars)), linetype = "dashed", color = "red", size = .5)
 
+```
 
+```{r,  message=FALSE, echo = FALSE,warning=FALSE}
 
 rest_num_chinese <- Chinese %>% group_by(postal_code) %>% count(postal_code) %>% rename(rest_num_chinese = n)
 rest_num_Tourist_chinese <- Chinese %>% group_by(Tourist) %>% count(Tourist) %>% rename(rest_num_tourist_chinese = n)
@@ -564,7 +565,7 @@ bar_plot1_chinese$tourist1 <- ifelse(bar_plot1_chinese$Tourist == "0",2,1)
 
 ggplot(bar_plot1_chinese) + geom_bar(mapping=aes(x = bus_stars, y = star_prop_tourist),stat = "identity", fill = bar_plot1_chinese$tourist1) + 
   facet_wrap(~bar_plot1_chinese$postal_code) + ylab("Star Proportion") + xlab("Stars") + 
-  ggtitle("Proportio of Stars by Postal Code - Italian", subtitle="Red - No Toursit Attracttion, Black - Tourist Attraction")
+  ggtitle("Proportion of Stars by Postal Code - Chinese", subtitle="Red - No Toursit Attracttion, Black - Tourist Attraction")
 
 ```
 
